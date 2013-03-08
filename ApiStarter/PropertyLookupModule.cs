@@ -23,27 +23,27 @@ namespace AviApi
 
 			Get ["/account/{accountNumber}"] = parameters =>
 			{
-				return Response.AsJson (new {valuations=_valuations.GetPropertyDetailsByAccountNumber (parameters.accountNumber)});
+				string accountNumber = parameters.accountNumber.ToString();
+				return Response.AsJson (_valuations.GetPropertyDetailsByAccountNumber (accountNumber));
 			};
 
 			Get ["/account/change/{accountNumber}"] = parameters =>
 			{
-				return Response.AsJson (new { valuation_difference = 
-					_valuations.GetValuesDifferenceByAccountNumber (parameters.accountNumber)
-				});
+				string accountNumber = parameters.accountNumber.ToString();
+				return Response.AsJson ( _valuations.GetValuesDifferenceByAccountNumber (accountNumber));
 			};
             
 			// Routes for Address lookup
 			Get ["/address/{address}"] = parameters =>
 			{
-				return Response.AsJson (new {valuations=_valuations.GetPropertyDetailsByAddress (parameters.address)});
+				string address = parameters.address.ToString();
+				return Response.AsJson (_valuations.GetPropertyDetailsByAddress (address));
 			};
 
 			Get ["/address/change/{address}"] = parameters =>
 			{
-				return Response.AsJson (new { valuation_difference = 
-					_valuations.GetValuesDifferenceByAddress (parameters.address)
-				});
+				string address = parameters.address.ToString();
+				return Response.AsJson (_valuations.GetValuesDifferenceByAddress (address));
 			};
 		}
 	}

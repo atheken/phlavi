@@ -13,9 +13,8 @@ namespace ApiStarter.Data
 	{
 		public void CreateDb(string dbPath)
 		{
-			Console.WriteLine("Loading valuations from OpenDataPhilly.org");
+			Console.WriteLine("Loading valuations from OpenDataPhilly.org, starting with 2014 data.");
 			var loader = new ValuationLoader();
-
 			#region load 2014 data
 			var data2014 = loader.LoadInformation<Valuation2014>(
 				"http://www.phila.gov/OPA/Documents/Tax%20Year%202014%20Data%20Set.zip",
@@ -28,6 +27,7 @@ namespace ApiStarter.Data
 				{
 					db.DropAndCreateTable<PropertyDetails>();
 					db.ExecuteSql("CREATE INDEX PropertyDetailsAccountNumber ON PropertyDetails(AccountNumber);");
+					db.ExecuteSql("CREATE INDEX PropertyDetailsAddress ON PropertyDetails(Address);");
 					db.InsertAll(
 					data2014.Select(row => new PropertyDetails()
 					{
@@ -48,10 +48,10 @@ namespace ApiStarter.Data
 					{
 						AccountNumber = row.Acct_Num,
 						Year = 2014,
-						Abat_Ex = row.Abat_Ex_14,
-						ImpVal = row.ImpVal_14,
-						Mktval = row.Mktval_14,
-						LandVal = row.LandVal_14
+						AbatementExemption = row.Abat_Ex_14,
+						ImprovementsValue = row.ImpVal_14,
+						MarketValue = row.Mktval_14,
+						LandValue = row.LandVal_14
 					}));
 					transaction.Commit();
 				}
@@ -78,10 +78,10 @@ namespace ApiStarter.Data
 					{
 						AccountNumber = row.Acct_Num,
 						Year = 2013,
-						Abat_Ex = row.Abat_Ex_13,
-						ImpVal = row.ImpVal_13,
-						Mktval = row.Mktval_13,
-						LandVal = row.LandVal_13
+						AbatementExemption = row.Abat_Ex_13,
+						ImprovementsValue = row.ImpVal_13,
+						MarketValue = row.Mktval_13,
+						LandValue = row.LandVal_13
 					}));
 
 					db.InsertAll(data2013

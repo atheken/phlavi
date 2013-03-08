@@ -2,7 +2,8 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Data;
-
+using ServiceStack.OrmLite;
+using ApiStarter.Data.Responses;
 
 namespace ApiStarter
 {
@@ -10,45 +11,101 @@ namespace ApiStarter
 	public class ValuationRepository
 	{
 		private Func<IDbConnection> _connectionProvider;
-		
-		public ValuationRepository ()
+
+		public ValuationRepository()
 		{
+			_connectionProvider = () => "./valuations.db".OpenDbConnection();
 		}
 
-		///<summary>Allows for testing... (Queryable could be loaded via DB, or in memory..)</summary>
+		///<summary>
+		///Passing in the Func allows for testing... (As the connection could be to an in-memory sqlite db if needed.)
+		///</summary>
 		public ValuationRepository (Func<IDbConnection> connectionProvider)
 		{
 			_connectionProvider = connectionProvider;
 		}
 
-		public PropertyDetails GetPropertyDetailsByAccountNumber (string accountNumber)
+		public ValuationInformation GetPropertyDetailsByAccountNumber (string accountNumber)
 		{
-			throw new NotImplementedException();
-			//return _queryable.FirstOrDefault (k => k.AccountNumber.ToLower ().Trim () == accountNumber.ToLower ().Trim ());
+			return GetDetailsBySingleParameter("AccountNumber", accountNumber);
 		}
 
-		public PropertyDetails GetPropertyDetailsByAddress (string address)
+		public ValuationInformation GetPropertyDetailsByAddress(string address)
 		{
-			throw new NotImplementedException();
-			//return _queryable.FirstOrDefault (k => k.Address.ToLower ().Trim () 
-			//	== address.ToLower ().Trim ());
+			//TODO: this should normalize the address before proceeding.
+			return GetDetailsBySingleParameter("Address", address);
 		}
 
-		public ValueDetails GetValuesDifferenceByAccountNumber (string accountNumber)
+		public ValuationAdjustment GetValuesDifferenceByAccountNumber(string accountNumber)
 		{
 			var details = GetPropertyDetailsByAccountNumber (accountNumber);
-			return ValuationDifferences (details);
+			return ValuationsForProperty (details);
 		}
 
-		public ValueDetails GetValuesDifferenceByAddress (string address)
+		public ValuationAdjustment GetValuesDifferenceByAddress (string address)
 		{
 			var details = GetPropertyDetailsByAddress (address);
-			return ValuationDifferences (details);
+			return ValuationsForProperty (details);
 		}
 
-		private ValueDetails ValuationDifferences (PropertyDetails details)
+		private ValuationInformation GetDetailsBySingleParameter(string fieldName, string parameter)
 		{
-			throw new NotImplementedException();
+			ValuationInformation retval = null;
+			try
+			{
+				using (var db = _connectionProvider())
+				{
+					var details = db.Select<PropertyDetails>(fieldName + " = {0}", parameter).FirstOrDefault();
+					if (details != null)
+					{
+						retval = new ValuationInformation
+						{
+							PropertyDetails = details,
+							Valuations = db.Select<ValueDetails>("AccountNumber = {0}", details.AccountNumber).ToArray()
+						};
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+
+			}
+			return retval;
+		}
+
+		private ValuationAdjustment ValuationsForProperty(ValuationInformation details)
+		{
+			ValuationAdjustment retval = null;
+			if (details != null)
+			{
+				var adjustment = new ValuationAdjustment
+				{
+					PropertyDetails = details.PropertyDetails
+				};
+
+				// Since I am lazy and don't want to see how many years of data are here
+				// I sort descending, take two, and then reverse the sort.
+				var values = details.Valuations.OrderByDescending(k => k.Year)
+					.Take(2).Reverse().ToArray();
+				
+				adjustment.StartYear = values.First().Year;
+				adjustment.EndYear = values.Last().Year;
+
+				//only if there's more than one year's values is there
+				//a difference, otherwise, all differences are 0.
+				if (values.Length == 2)
+				{
+					var first = values.First();
+					var last = values.Last();
+
+					adjustment.ImprovementsValueChange = last.ImprovementsValue - first.ImprovementsValue;
+					adjustment.LandValueChange = last.LandValue - first.LandValue;
+					adjustment.MarketValueChange = last.MarketValue - first.MarketValue;
+					adjustment.AbatementExemptionChange = last.AbatementExemption - first.AbatementExemption;
+				}
+				
+			}
+			return retval;
 		}
 
 	}

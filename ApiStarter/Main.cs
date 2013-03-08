@@ -10,17 +10,18 @@ namespace ApiStarter
 {
 	class MainClass
 	{
-		public static void Main (string[] args)
+		public static void Main(string[] args)
 		{
 			//this is a global 'setup' option, it can be set on a per connection basis, but this is simpler.
 			OrmLiteConfig.DialectProvider = SqliteDialect.Provider;
 
-			try {
+			try
+			{
 				var dbName = "./valuations.db";
 				if (!File.Exists(dbName))
 				{
 					var fileCreator = new DbFileCreator();
-					var tempName = dbName + Guid.NewGuid().ToString("n");
+					var tempName = dbName + ".temp." + Guid.NewGuid().ToString("n");
 					fileCreator.CreateDb(tempName);
 					//so, basicaly, this is an "atomic" move, once this is moved,
 					//"valuations.db" will be complete. 
@@ -29,20 +30,23 @@ namespace ApiStarter
 				}
 
 				var uri = "http://localhost:9999";
-				if (args.Length == 1) {
-					uri = args [0];
+				if (args.Length == 1)
+				{
+					uri = args[0];
 				}
 
-				var nancy = new NancyHost (new Uri (uri));
+				var nancy = new NancyHost(new Uri(uri));
 
-				nancy.Start ();
-				Console.WriteLine ("Nancy's jammin' on '" + uri + "'. Press <enter> to stop the server.");
-				Console.ReadLine ();
-				nancy.Stop ();
+				nancy.Start();
+				Console.WriteLine("Nancy's jammin' on '" + uri + "'. Press <enter> to stop the server.");
+				Console.ReadLine();
+				nancy.Stop();
 
-			} catch (Exception ex) {
-				Console.WriteLine (ex.Message);
-				Console.WriteLine (ex.StackTrace);
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+				Console.WriteLine(ex.StackTrace);
 			}
 		}
 	}

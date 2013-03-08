@@ -17,17 +17,17 @@ namespace ApiStarter
 		public string Num_Stor{ get; set; }
 		public double Latitude{ get; set; }
 		public double Longitude{ get; set; }
-		//public IDictionary<int,ValueDetails> Valuations { get; set; }
 	}
 
 	public class ValueDetails
 	{
-		[PrimaryKey]
+		[AutoIncrement]
+		public int Id { get; set; }
 		public string AccountNumber { get; set; }
-		public int Mktval { get; set; }
-		public int LandVal { get; set; }
-		public int ImpVal { get; set; }
-		public int Abat_Ex { get; set; }
+		public int MarketValue { get; set; }
+		public int LandValue { get; set; }
+		public int ImprovementsValue { get; set; }
+		public int AbatementExemption { get; set; }
 		public int Year { get; set; }
 	}
 }

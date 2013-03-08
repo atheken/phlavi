@@ -60,6 +60,7 @@
       <HintPath>..\packages\CsvHelper.1.14.0\lib\net40-client\CsvHelper.dll</HintPath>
     </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.Data.SQLite">
       <HintPath>..\packages\System.Data.SQLite.x64.1.0.84.0\lib\net40\System.Data.SQLite.dll</HintPath>
     </Reference>
@@ -69,6 +70,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\DbFileCreator.cs" />
+    <Compile Include="Data\Responses\ValuationInformation.cs" />
+    <Compile Include="Data\Responses\ValuationAdjustment.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="PropertyLookupModule.cs" />
