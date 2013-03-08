@@ -18,7 +18,7 @@ namespace AviApi
 			_valuations = repo;
 
 			Get ["/"] = parameters => {
-				return "Hi, Check out the /account/ Api!";
+				return "Hi, Check out the /account/ API!";
 			};
 
 			Get ["/account/{accountNumber}"] = parameters =>
